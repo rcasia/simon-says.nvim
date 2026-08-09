@@ -55,12 +55,13 @@ luacov_start
 if [[ -n $1 ]] && [[ $1 == "--fail-fast" ]]; then
   echo "Running tests with --fail-fast"
   nvim --headless --noplugin -u ${minimal} \
-    -c "PlenaryBustedDirectory tests/ {minimal_init = '${minimal}', sequential = true, keep_going = false}" | tee "${tempfile}"
+    -c "lua require('plenary.test_harness').test_directory('./tests/', { minimal_init = '${minimal}', sequential = true, keep_going = false })" | tee "${tempfile}"
 elif [[ -n $1 ]] && [[ -d $1 ]]; then
   nvim --headless --noplugin -u ${minimal} \
     -c "lua require('plenary.test_harness').test_directory('$1', { minimal_init = '${minimal}', sequential = true })" | tee "${tempfile}"
 elif [[ -n $1 ]]; then
-  nvim --headless --noplugin -u ${minimal} -c "PlenaryBustedFile $1" | tee "${tempfile}"
+  nvim --headless --noplugin -u ${minimal} \
+    -c "lua require('plenary.test_harness').test_directory('$1', { minimal_init = '${minimal}', sequential = true })" | tee "${tempfile}"
 else
   nvim --headless --noplugin -u ${minimal} \
     -c "lua require('plenary.test_harness').test_directory('./tests/', { minimal_init = 'tests/minimal.lua', sequential = true })" | tee "${tempfile}"
