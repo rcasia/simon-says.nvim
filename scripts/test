@@ -17,10 +17,6 @@ function setup_environment() {
   if [[ ! -d "${plugins_dir}/plenary.nvim" ]]; then
     echo "[plugins] plenary.nvim: installing..."
     git clone https://github.com/nvim-lua/plenary.nvim "${plugins_dir}/plenary.nvim"
-    # commit 9069d14a120cadb4f6825f76821533f2babcab92 broke luacov
-    # issue: https://github.com/nvim-lua/plenary.nvim/issues/353
-    local -r plenary_353_patch="$(pwd)/scripts/plenary-353.patch"
-    git -C "${plugins_dir}/plenary.nvim" apply "${plenary_353_patch}"
     echo "[plugins] plenary.nvim: installed"
     echo
   fi
@@ -60,6 +56,9 @@ if [[ -n $1 ]] && [[ $1 == "--fail-fast" ]]; then
   echo "Running tests with --fail-fast"
   nvim --headless --noplugin -u ${minimal} \
     -c "PlenaryBustedDirectory tests/ {minimal_init = '${minimal}', sequential = true, keep_going = false}" | tee "${tempfile}"
+elif [[ -n $1 ]] && [[ -d $1 ]]; then
+  nvim --headless --noplugin -u ${minimal} \
+    -c "lua require('plenary.test_harness').test_directory('$1', { minimal_init = '${minimal}', sequential = true })" | tee "${tempfile}"
 elif [[ -n $1 ]]; then
   nvim --headless --noplugin -u ${minimal} -c "PlenaryBustedFile $1" | tee "${tempfile}"
 else
