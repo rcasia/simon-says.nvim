@@ -1,0 +1,4 @@
+.luacov
+.tests/
+*.swp
+*.swo
