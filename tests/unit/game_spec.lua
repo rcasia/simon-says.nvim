@@ -272,4 +272,113 @@ describe("Simon Says game", function()
 			assert.are.equal(state, new_state)
 		end)
 	end)
+
+	describe("PLAYER_INPUT action", function()
+		it("ignores input when not in input phase", function()
+			local state = makeState({
+				sequence = { 1 },
+				gamePhase = "showing",
+				playerIndex = 0,
+			})
+			local new_state = gameReducer(state, { type = "PLAYER_INPUT", colorIndex = 1 })
+			-- State should be unchanged
+			assert.are.equal(state, new_state)
+		end)
+
+		it("ignores input when game is idle", function()
+			local state = makeState({
+				sequence = { 1 },
+				gamePhase = "idle",
+				playerIndex = 0,
+			})
+			local new_state = gameReducer(state, { type = "PLAYER_INPUT", colorIndex = 1 })
+			assert.are.equal(state, new_state)
+		end)
+
+		it("ignores input when game is over", function()
+			local state = makeState({
+				sequence = { 1 },
+				gamePhase = "gameover",
+				playerIndex = 0,
+			})
+			local new_state = gameReducer(state, { type = "PLAYER_INPUT", colorIndex = 1 })
+			assert.are.equal(state, new_state)
+		end)
+
+		it("handles correct input and sets inputFlash", function()
+			local state = makeState({
+				sequence = { 1, 2, 3 },
+				gamePhase = "input",
+				playerIndex = 0,
+			})
+			local new_state = gameReducer(state, { type = "PLAYER_INPUT", colorIndex = 1 })
+			assert.are.equal(1, new_state.playerIndex)
+			assert.are.equal(1, new_state.inputFlash)
+			assert.are.equal(0, new_state.score) -- not complete yet
+		end)
+
+		it("scores when player completes the sequence", function()
+			local state = makeState({
+				sequence = { 1 },
+				gamePhase = "input",
+				playerIndex = 0,
+			})
+			local new_state = gameReducer(state, { type = "PLAYER_INPUT", colorIndex = 1 })
+			assert.are.equal(1, new_state.score)
+			assert.are.equal(1, new_state.playerIndex)
+			assert.is_true(new_state.pendingNextRound)
+		end)
+
+		it("sets gameover on wrong input", function()
+			local state = makeState({
+				sequence = { 1, 2, 3 },
+				gamePhase = "input",
+				playerIndex = 0,
+				score = 3,
+				highScore = 5,
+			})
+			local new_state = gameReducer(state, { type = "PLAYER_INPUT", colorIndex = 2 })
+			assert.are.equal("gameover", new_state.gamePhase)
+			assert.are.equal(3, new_state.score) -- score preserved
+			assert.are.equal(5, new_state.highScore)
+			assert.is_nil(new_state.inputFlash) -- flash cleared on gameover
+		end)
+
+		it("updates high score on correct final input", function()
+			local state = makeState({
+				sequence = { 1 },
+				gamePhase = "input",
+				playerIndex = 0,
+				score = 5,
+				highScore = 5,
+			})
+			local new_state = gameReducer(state, { type = "PLAYER_INPUT", colorIndex = 1 })
+			assert.are.equal(6, new_state.score)
+			assert.are.equal(6, new_state.highScore)
+		end)
+
+		it("plays through a full sequence correctly", function()
+			local state = makeState({
+				sequence = { 1, 2, 3 },
+				gamePhase = "input",
+				playerIndex = 0,
+			})
+
+			-- First input: correct (color 1)
+			state = gameReducer(state, { type = "PLAYER_INPUT", colorIndex = 1 })
+			assert.are.equal(1, state.playerIndex)
+			assert.are.equal(0, state.score)
+
+			-- Second input: correct (color 2)
+			state = gameReducer(state, { type = "PLAYER_INPUT", colorIndex = 2 })
+			assert.are.equal(2, state.playerIndex)
+			assert.are.equal(0, state.score)
+
+			-- Third input: correct (color 3) — round complete
+			state = gameReducer(state, { type = "PLAYER_INPUT", colorIndex = 3 })
+			assert.are.equal(3, state.playerIndex)
+			assert.are.equal(1, state.score)
+			assert.is_true(state.pendingNextRound)
+		end)
+	end)
 end)

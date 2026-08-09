@@ -82,6 +82,32 @@ local function gameReducer(state, action)
 		local new_state = vim.tbl_extend("force", state, {})
 		new_state.inputFlash = nil
 		return new_state
+	elseif action.type == "PLAYER_INPUT" then
+		-- Guard: ignore input if not in input phase
+		if state.gamePhase ~= "input" then
+			return state
+		end
+		local colorIndex = action.colorIndex
+		-- Set input flash for visual feedback
+		local newState = vim.tbl_extend("force", state, { inputFlash = colorIndex })
+		-- Check if the input matches the expected sequence position
+		if state.sequence[state.playerIndex + 1] == colorIndex then
+			-- Correct input
+			local newPlayerIndex = state.playerIndex + 1
+			local roundComplete = newPlayerIndex >= #state.sequence
+			local newScore = roundComplete and state.score + 1 or state.score
+			local newHighScore = math.max(state.highScore, newScore)
+			return vim.tbl_extend("force", newState, {
+				playerIndex = newPlayerIndex,
+				score = newScore,
+				highScore = newHighScore,
+				pendingNextRound = roundComplete,
+			})
+		else
+			-- Wrong input — game over, clear flash
+			newState.inputFlash = nil
+			return vim.tbl_extend("force", newState, { gamePhase = "gameover" })
+		end
 	end
 	return state
 end
@@ -111,15 +137,7 @@ local function useSimonGame()
 	--- Handle player input on a quadrant
 	--- @param colorIndex number
 	local function handleInput(colorIndex)
-		if state.gamePhase ~= "input" then
-			return
-		end
-		dispatch({ type = "INPUT_FLASH", colorIndex = colorIndex })
-		if state.sequence[state.playerIndex + 1] == colorIndex then
-			dispatch({ type = "CORRECT_INPUT" })
-		else
-			dispatch({ type = "WRONG_INPUT" })
-		end
+		dispatch({ type = "PLAYER_INPUT", colorIndex = colorIndex })
 	end
 
 	-- Start showing first flash when entering "showing" phase
