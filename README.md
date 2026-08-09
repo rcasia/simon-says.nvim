@@ -23,6 +23,16 @@ Run `:SimonSays` to start the game.
 - Enter to select
 - q to quit
 
+## Development
+
+### Running tests
+
+```bash
+make test
+```
+
+Tests require `plenary.nvim` (cloned automatically by the test script).
+
 ## License
 
 MIT
