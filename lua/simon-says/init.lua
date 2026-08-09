@@ -5,7 +5,8 @@
 local ui = require("ascii-ui")
 local Paragraph = ui.components.Paragraph
 local components = require("simon-says.components")
-local useSimonGame = require("simon-says.game")
+local game = require("simon-says.game")
+local useSimonGame = game.useSimonGame
 
 local M = {}
 

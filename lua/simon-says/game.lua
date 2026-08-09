@@ -40,15 +40,16 @@ local function gameReducer(state, action)
 	elseif action.type == "NEXT_ROUND" then
 		local newSeq = vim.list_extend({}, state.sequence)
 		table.insert(newSeq, math.random(1, 4))
-		return vim.tbl_extend("force", state, {
+		local new_state = vim.tbl_extend("force", state, {
 			sequence = newSeq,
 			playerIndex = 0,
 			gamePhase = "showing",
 			currentFlash = 0,
 			flashVisible = false,
 			pendingNextRound = false,
-			inputFlash = nil,
 		})
+		new_state.inputFlash = nil
+		return new_state
 	elseif action.type == "CORRECT_INPUT" then
 		local newPlayerIndex = state.playerIndex + 1
 		local roundComplete = newPlayerIndex >= #state.sequence
@@ -61,7 +62,9 @@ local function gameReducer(state, action)
 			pendingNextRound = roundComplete,
 		})
 	elseif action.type == "WRONG_INPUT" then
-		return vim.tbl_extend("force", state, { gamePhase = "gameover", inputFlash = nil })
+		local new_state = vim.tbl_extend("force", state, { gamePhase = "gameover" })
+		new_state.inputFlash = nil
+		return new_state
 	elseif action.type == "SHOW_FLASH" then
 		return vim.tbl_extend("force", state, { flashVisible = true })
 	elseif action.type == "HIDE_FLASH" then
@@ -76,7 +79,9 @@ local function gameReducer(state, action)
 	elseif action.type == "INPUT_FLASH" then
 		return vim.tbl_extend("force", state, { inputFlash = action.colorIndex })
 	elseif action.type == "CLEAR_INPUT_FLASH" then
-		return vim.tbl_extend("force", state, { inputFlash = nil })
+		local new_state = vim.tbl_extend("force", state, {})
+		new_state.inputFlash = nil
+		return new_state
 	end
 	return state
 end
@@ -162,4 +167,8 @@ local function useSimonGame()
 	}
 end
 
-return useSimonGame
+return {
+	useSimonGame = useSimonGame,
+	gameReducer = gameReducer,
+	INITIAL_STATE = INITIAL_STATE,
+}
