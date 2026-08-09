@@ -5,8 +5,17 @@ local testing_e2e = require("ascii-ui.testing.e2e")
 local simon = require("simon-says")
 
 describe("Simon Says game e2e", function()
+	local screen
+
+	after_each(function()
+		if screen then
+			screen:unmount()
+			screen = nil
+		end
+	end)
+
 	it("starts game when quadrant is pressed", function()
-		local screen = testing_e2e.mount(simon.App)
+		screen = testing_e2e.mount(simon.App)
 
 		-- Wait for initial render
 		vim.wait(500)
@@ -25,7 +34,7 @@ describe("Simon Says game e2e", function()
 	end)
 
 	it("transitions through game phases correctly", function()
-		local screen = testing_e2e.mount(simon.App)
+		screen = testing_e2e.mount(simon.App)
 
 		-- Wait for initial render
 		vim.wait(500)
@@ -50,7 +59,7 @@ describe("Simon Says game e2e", function()
 	end)
 
 	it("handles player input and transitions to next state", function()
-		local screen = testing_e2e.mount(simon.App)
+		screen = testing_e2e.mount(simon.App)
 
 		-- Wait for initial render
 		vim.wait(500)
@@ -82,7 +91,7 @@ describe("Simon Says game e2e", function()
 	end)
 
 	it("shows game over message after wrong input", function()
-		local screen = testing_e2e.mount(simon.App)
+		screen = testing_e2e.mount(simon.App)
 
 		-- Wait for initial render
 		vim.wait(500)
@@ -116,7 +125,7 @@ describe("Simon Says game e2e", function()
 	end)
 
 	it("increments score on correct input", function()
-		local screen = testing_e2e.mount(simon.App)
+		screen = testing_e2e.mount(simon.App)
 
 		-- Wait for initial render
 		vim.wait(500)
@@ -170,7 +179,7 @@ describe("Simon Says game e2e", function()
 	end)
 
 	it("allows restarting after game over", function()
-		local screen = testing_e2e.mount(simon.App)
+		screen = testing_e2e.mount(simon.App)
 
 		-- Wait for initial render
 		vim.wait(500)
