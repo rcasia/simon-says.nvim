@@ -19,7 +19,7 @@ describe("Simon Says game e2e", function()
 
 		-- Wait for initial render
 		vim.wait(500)
-		
+
 		-- Initial state: idle phase
 		assert.is_true(screen:waitForText("Press any quadrant to start", 2000))
 

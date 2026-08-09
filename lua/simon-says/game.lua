@@ -4,7 +4,6 @@
 
 local ui = require("ascii-ui")
 local useReducer = ui.hooks.useReducer
-local useEffect = ui.hooks.useEffect
 local useTimeout = ui.hooks.useTimeout
 
 --- @class simon-says.GameState
