@@ -12,14 +12,14 @@ local M = {}
 
 --- Main App component
 local App = ui.createComponent("App", function()
-	local game = useSimonGame()
-	local state = game.state
+	local simonGame = useSimonGame()
+	local state = simonGame.state
 
 	local function handleQuadrantPress(colorIndex)
 		if state.gamePhase == "idle" or state.gamePhase == "gameover" then
-			game.startGame()
+			simonGame.startGame()
 		elseif state.gamePhase == "input" then
-			game.handleInput(colorIndex)
+			simonGame.handleInput(colorIndex)
 		end
 	end
 
