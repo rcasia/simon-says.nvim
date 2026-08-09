@@ -45,4 +45,7 @@ function M.start()
 	ui.mount(App)
 end
 
+--- Exported for e2e testing
+M.App = App
+
 return M

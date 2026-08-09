@@ -1,0 +1,17 @@
+pcall(require, "luacov")
+
+local testing = require("ascii-ui.testing")
+local ui = require("ascii-ui")
+local GameInstructions = require("simon-says.components.game-instructions")
+
+describe("GameInstructions", function()
+	it("renders controls text", function()
+		local App = ui.createComponent("App", function()
+			return GameInstructions()
+		end)
+		local screen = testing.render(App)
+		assert(screen:hasText("Controls:"))
+		assert(screen:hasText("Navigate"))
+		assert(screen:hasText("Enter"))
+	end)
+end)
