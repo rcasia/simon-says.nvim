@@ -33,7 +33,7 @@ local function gameReducer(state, action)
 			highScore = state.highScore,
 			gamePhase = "showing",
 			currentFlash = 0,
-			flashVisible = false,
+			flashVisible = true, -- Start with flash visible immediately
 			pendingNextRound = false,
 			inputFlash = nil,
 		}
@@ -45,7 +45,7 @@ local function gameReducer(state, action)
 			playerIndex = 0,
 			gamePhase = "showing",
 			currentFlash = 0,
-			flashVisible = false,
+			flashVisible = true, -- Start with flash visible immediately
 			pendingNextRound = false,
 		})
 		new_state.inputFlash = nil
@@ -140,12 +140,8 @@ local function useSimonGame()
 		dispatch({ type = "PLAYER_INPUT", colorIndex = colorIndex })
 	end
 
-	-- Start showing first flash when entering "showing" phase
-	useEffect(function()
-		if state.gamePhase == "showing" and state.currentFlash == 0 and not state.flashVisible then
-			dispatch({ type = "SHOW_FLASH" })
-		end
-	end, { state.gamePhase })
+	-- Note: flashVisible is now set to true directly in START_GAME and NEXT_ROUND reducers
+	-- This avoids an infinite loop where useEffect would dispatch SHOW_FLASH repeatedly
 
 	-- Hide flash after 600ms when visible
 	useTimeout(function()
